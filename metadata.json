@@ -1,0 +1,6 @@
+{
+  "name": "Scalper Pro LIVE",
+  "description": "Terminale di trading automatico live con flussi OKX WebSocket/REST pubblici, indici globali e analisi tecnica multi-indicatore.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

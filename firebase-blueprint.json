@@ -1,0 +1,231 @@
+{
+  "entities": {
+    "CloudTerminalState": {
+      "title": "CloudTerminalState",
+      "description": "Cloud-synced trading terminal and 3-bot 24/7 summary state owned by an authenticated trader.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the owner.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "selectedPair": {
+          "type": "string",
+          "description": "Currently active market pair.",
+          "maxLength": 40
+        },
+        "equityEur": {
+          "type": "number",
+          "description": "Current terminal equity in EUR."
+        },
+        "realizedPnlEur": {
+          "type": "number",
+          "description": "Total realized PnL in EUR."
+        },
+        "botActive": {
+          "type": "boolean",
+          "description": "Whether the 3 autonomous 3-minute bots are running 24/7."
+        },
+        "botVaultEur": {
+          "type": "number",
+          "description": "Locked 59% profit reserve vault in EUR."
+        },
+        "botActiveCapitalEur": {
+          "type": "number",
+          "description": "Active compounding bot capital in EUR."
+        },
+        "botMonthlyGoalPct": {
+          "type": "number",
+          "description": "Monthly return target percentage (default 100)."
+        },
+        "botCyclesCount": {
+          "type": "integer",
+          "description": "Total completed 3-minute cycles."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest update."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Immutable server creation timestamp."
+        }
+      },
+      "required": [
+        "ownerId",
+        "selectedPair",
+        "equityEur",
+        "realizedPnlEur",
+        "botActive",
+        "botVaultEur",
+        "botActiveCapitalEur",
+        "botMonthlyGoalPct",
+        "botCyclesCount",
+        "updatedAt",
+        "createdAt"
+      ]
+    },
+    "BotCycleRecord": {
+      "title": "BotCycleRecord",
+      "description": "Immutable audit record of a completed or active 3-minute 3-bot AI cycle saved to the cloud.",
+      "type": "object",
+      "properties": {
+        "cycleId": {
+          "type": "string",
+          "description": "Unique cycle identifier.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the owner.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "cycleNumber": {
+          "type": "integer",
+          "description": "Sequential cycle number."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["running", "completed"],
+          "description": "Cycle lifecycle status.",
+          "maxLength": 20
+        },
+        "startingCapitalEur": {
+          "type": "number",
+          "description": "Active capital at start of cycle."
+        },
+        "netPnlEur": {
+          "type": "number",
+          "description": "Net PnL of the 3 bots in EUR."
+        },
+        "vaultAddedEur": {
+          "type": "number",
+          "description": "59% profit locked in reserve vault."
+        },
+        "reinvestedEur": {
+          "type": "number",
+          "description": "41% profit reinvested in compounding capital."
+        },
+        "vaultTotalEur": {
+          "type": "number",
+          "description": "Cumulative vault total after this cycle."
+        },
+        "positionsSummary": {
+          "type": "string",
+          "description": "Compact summary of the 3 AI-picked positions, techniques, and reasoning.",
+          "maxLength": 4000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Immutable server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest update."
+        }
+      },
+      "required": [
+        "cycleId",
+        "ownerId",
+        "cycleNumber",
+        "status",
+        "startingCapitalEur",
+        "netPnlEur",
+        "vaultAddedEur",
+        "reinvestedEur",
+        "vaultTotalEur",
+        "positionsSummary",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "EmailAlertLog": {
+      "title": "EmailAlertLog",
+      "description": "Audit record of a pre-breakout HTML alert banner dispatched via Gmail.",
+      "type": "object",
+      "properties": {
+        "alertId": {
+          "type": "string",
+          "description": "Unique alert dispatch identifier.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Authenticated Firebase UID of the owner.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "recipientEmail": {
+          "type": "string",
+          "format": "email",
+          "description": "Target email address.",
+          "maxLength": 160
+        },
+        "subject": {
+          "type": "string",
+          "description": "Email subject line.",
+          "maxLength": 240
+        },
+        "topAsset": {
+          "type": "string",
+          "description": "Primary flagged pre-breakout memecoin or crypto.",
+          "maxLength": 64
+        },
+        "signalsCount": {
+          "type": "integer",
+          "description": "Number of signals included in the banner."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["sent"],
+          "description": "Delivery status.",
+          "maxLength": 20
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Immutable server creation timestamp."
+        }
+      },
+      "required": [
+        "alertId",
+        "ownerId",
+        "recipientEmail",
+        "subject",
+        "topAsset",
+        "signalsCount",
+        "status",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/cloudState/{stateId}": {
+      "schema": {
+        "$ref": "#/entities/CloudTerminalState"
+      },
+      "description": "User-isolated cloud terminal and 24/7 bot state snapshot."
+    },
+    "/users/{userId}/botCycles/{cycleId}": {
+      "schema": {
+        "$ref": "#/entities/BotCycleRecord"
+      },
+      "description": "User-isolated 3-minute AI bot cycle records with 59% profit vault accounting."
+    },
+    "/users/{userId}/emailAlerts/{alertId}": {
+      "schema": {
+        "$ref": "#/entities/EmailAlertLog"
+      },
+      "description": "User-isolated Gmail pre-breakout alert banner dispatch logs."
+    }
+  }
+}

@@ -1,0 +1,246 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isVerifiedOwner(userId) {
+      return isVerifiedUser() && isValidId(userId) && request.auth.uid == userId;
+    }
+
+    function isValidCloudTerminalState(data, userId) {
+      return data.keys().hasAll([
+          'ownerId',
+          'selectedPair',
+          'equityEur',
+          'realizedPnlEur',
+          'botActive',
+          'botVaultEur',
+          'botActiveCapitalEur',
+          'botMonthlyGoalPct',
+          'botCyclesCount',
+          'updatedAt',
+          'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'ownerId',
+          'selectedPair',
+          'equityEur',
+          'realizedPnlEur',
+          'botActive',
+          'botVaultEur',
+          'botActiveCapitalEur',
+          'botMonthlyGoalPct',
+          'botCyclesCount',
+          'updatedAt',
+          'createdAt'
+        ])
+        && data.ownerId is string
+        && data.ownerId == userId
+        && data.ownerId == request.auth.uid
+        && data.selectedPair is string
+        && data.selectedPair.size() >= 1
+        && data.selectedPair.size() <= 40
+        && data.equityEur is number
+        && data.realizedPnlEur is number
+        && data.botActive is bool
+        && data.botVaultEur is number
+        && data.botActiveCapitalEur is number
+        && data.botMonthlyGoalPct is number
+        && data.botCyclesCount is int
+        && data.botCyclesCount >= 0
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidBotCycleRecord(data, userId, cycleId) {
+      return data.keys().hasAll([
+          'cycleId',
+          'ownerId',
+          'cycleNumber',
+          'status',
+          'startingCapitalEur',
+          'netPnlEur',
+          'vaultAddedEur',
+          'reinvestedEur',
+          'vaultTotalEur',
+          'positionsSummary',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'cycleId',
+          'ownerId',
+          'cycleNumber',
+          'status',
+          'startingCapitalEur',
+          'netPnlEur',
+          'vaultAddedEur',
+          'reinvestedEur',
+          'vaultTotalEur',
+          'positionsSummary',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.cycleId is string
+        && data.cycleId == cycleId
+        && data.ownerId is string
+        && data.ownerId == userId
+        && data.ownerId == request.auth.uid
+        && data.cycleNumber is int
+        && data.cycleNumber >= 1
+        && data.status is string
+        && data.status in ['running', 'completed']
+        && data.startingCapitalEur is number
+        && data.netPnlEur is number
+        && data.vaultAddedEur is number
+        && data.reinvestedEur is number
+        && data.vaultTotalEur is number
+        && data.positionsSummary is string
+        && data.positionsSummary.size() <= 4000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidEmailAlertLog(data, userId, alertId) {
+      return data.keys().hasAll([
+          'alertId',
+          'ownerId',
+          'recipientEmail',
+          'subject',
+          'topAsset',
+          'signalsCount',
+          'status',
+          'createdAt'
+        ])
+        && data.keys().hasOnly([
+          'alertId',
+          'ownerId',
+          'recipientEmail',
+          'subject',
+          'topAsset',
+          'signalsCount',
+          'status',
+          'createdAt'
+        ])
+        && data.alertId is string
+        && data.alertId == alertId
+        && data.ownerId is string
+        && data.ownerId == userId
+        && data.ownerId == request.auth.uid
+        && data.recipientEmail is string
+        && data.recipientEmail.size() >= 5
+        && data.recipientEmail.size() <= 160
+        && data.recipientEmail.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+        && data.subject is string
+        && data.subject.size() >= 1
+        && data.subject.size() <= 240
+        && data.topAsset is string
+        && data.topAsset.size() >= 1
+        && data.topAsset.size() <= 64
+        && data.signalsCount is int
+        && data.signalsCount >= 1
+        && data.signalsCount <= 50
+        && data.status is string
+        && data.status == 'sent'
+        && data.createdAt is timestamp;
+    }
+
+    match /users/{userId}/cloudState/{stateId} {
+      allow get: if isVerifiedOwner(userId) && isValidId(stateId);
+      allow list: if isVerifiedUser()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedOwner(userId)
+        && isValidId(stateId)
+        && isValidCloudTerminalState(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedOwner(userId)
+        && isValidId(stateId)
+        && isValidCloudTerminalState(incoming(), userId)
+        && incoming().ownerId == existing().ownerId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'selectedPair',
+          'equityEur',
+          'realizedPnlEur',
+          'botActive',
+          'botVaultEur',
+          'botActiveCapitalEur',
+          'botMonthlyGoalPct',
+          'botCyclesCount',
+          'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    match /users/{userId}/botCycles/{cycleId} {
+      allow get: if isVerifiedOwner(userId) && isValidId(cycleId);
+      allow list: if isVerifiedUser()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedOwner(userId)
+        && isValidId(cycleId)
+        && isValidBotCycleRecord(incoming(), userId, cycleId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedOwner(userId)
+        && isValidId(cycleId)
+        && isValidBotCycleRecord(incoming(), userId, cycleId)
+        && existing().status != 'completed'
+        && incoming().ownerId == existing().ownerId
+        && incoming().cycleId == existing().cycleId
+        && incoming().cycleNumber == existing().cycleNumber
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly([
+          'status',
+          'netPnlEur',
+          'vaultAddedEur',
+          'reinvestedEur',
+          'vaultTotalEur',
+          'positionsSummary',
+          'updatedAt'
+        ]);
+      allow delete: if false;
+    }
+
+    match /users/{userId}/emailAlerts/{alertId} {
+      allow get: if isVerifiedOwner(userId) && isValidId(alertId);
+      allow list: if isVerifiedUser()
+        && isValidId(userId)
+        && request.auth.uid == userId
+        && resource.data.ownerId == request.auth.uid;
+      allow create: if isVerifiedOwner(userId)
+        && isValidId(alertId)
+        && isValidEmailAlertLog(incoming(), userId, alertId)
+        && incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+  }
+}

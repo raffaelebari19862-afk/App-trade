@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="it"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Scalper Pro LIVE</title>
+<style>
+:root{--bg:#f3f5f8;--cd:#fff;--ink:#0e1726;--mu:#6e7891;--ln:#e6e9f0;--up:#00a838;--dn:#e5484d;--sf:#f0f3f7;--bl:#2f6bff;padding-top:env(safe-area-inset-top,0)}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1017;--cd:#171b26;--ink:#eef1f8;--mu:#8590aa;--ln:#262c3b;--up:#25d366;--dn:#ff5a5f;--sf:#1f2432;--bl:#4d82ff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,sans-serif}
+#app{max-width:720px;margin:0 auto;padding:12px 12px 50px}
+.cd{background:var(--cd);border-radius:16px;padding:14px;margin-bottom:12px}
+h1{font-size:19px;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+#st{font-size:11px;padding:4px 10px;border-radius:99px;border:1.5px solid var(--mu);color:var(--mu)}
+#st.ok{color:var(--up);border-color:var(--up)}
+#eq{font-size:32px;font-weight:800}#pl{font-weight:700}
+.mini{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.mini div{background:var(--sf);border-radius:10px;padding:7px;text-align:center;font-size:11px;color:var(--mu)}
+.mini b{display:block;font-size:14px;color:var(--ink)}
+.btn{border:0;border-radius:99px;padding:8px 13px;font:inherit;font-weight:700;font-size:12.5px;background:var(--sf);color:var(--ink);cursor:pointer}
+.btn.on{background:var(--up);color:#fff}.btn.dn{background:var(--dn);color:#fff}.btn.sm{padding:4px 9px;font-size:11px}
+.ctl{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.set{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.set label{font-size:10.5px;color:var(--mu);font-weight:700;display:flex;flex-direction:column;gap:3px}
+.set input{width:100%;padding:7px;border-radius:9px;border:1px solid var(--ln);background:var(--sf);color:var(--ink);font:inherit;font-weight:700}
+summary{cursor:pointer;color:var(--mu);font-weight:700;margin-top:10px}
+h2{font-size:16px;margin:16px 2px 8px}
+.row{display:grid;grid-template-columns:1fr auto 70px;gap:8px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--ln)}
+.row:last-child{border:0}.row small{color:var(--mu);display:block;font-size:11px}
+.pr{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.pl{border-radius:8px;padding:6px 0;text-align:center;font-size:11px;font-weight:800;background:var(--sf);color:var(--mu)}
+.pl.L{background:var(--up);color:#fff}.pl.S{background:var(--dn);color:#fff}
+.seg{display:flex;gap:6px;margin-bottom:8px}.seg button{flex:1}
+.g{color:var(--up)}.r{color:var(--dn)}.em{text-align:center;color:var(--mu);padding:16px}
+.ps{display:flex;justify-content:space-between;gap:8px;padding:9px 2px;border-bottom:1px solid var(--ln)}
+.ps small{display:block;color:var(--mu);font-size:11px}
+#toast{position:fixed;left:50%;top:10px;transform:translate(-50%,-150%);background:var(--ink);color:var(--bg);padding:10px 15px;border-radius:12px;font-weight:700;font-size:12.5px;transition:transform .25s;z-index:9;max-width:92%}
+#toast.show{transform:translate(-50%,0)}
+footer{font-size:11px;color:var(--mu);margin-top:14px}
+</style></head><body><div id="app">
+<div class="cd">
+<h1>Scalper Pro <span id="st">CONNESSIONE…</span></h1>
+<small style="color:var(--mu)">Capitale operativo</small>
+<div id="eq">€500.00</div><div id="pl">€0.00</div>
+<div class="mini">
+<div>Residuo<b id="sR">-</b></div><div>Utilizzato<b id="sU">-</b></div><div>Commissioni<b id="sF">-</b></div>
+<div>Vinte / Perse<b id="sWL">0 / 0</b></div><div>Win rate<b id="sWR">-</b></div><div>Aperte<b id="sO">0</b></div></div>
+<div class="ctl"><button class="btn on" id="bAuto">Auto ON</button><button class="btn" id="bPush">Notifiche OFF</button><button class="btn" id="bRst">Azzera</button></div>
+<details><summary>Impostazioni</summary><div class="set">
+<label>Capitale €<input id="cap" type="number" value="500"></label>
+<label>Importo €<input id="sz" type="number" value="150"></label>
+<label>Costo € apri/chiudi<input id="fee" type="number" step="0.1" value="1"></label>
+<label>Leva crypto<input id="clev" type="number" value="10"></label>
+<label>Leva indici/metalli<input id="lev" type="number" value="5"></label>
+<label>Max aperte<input id="mo" type="number" value="3"></label>
+<label>R:R netto min<input id="rr" type="number" step="0.1" value="1.5"></label>
+<label>Conferme min<input id="cf" type="number" value="2"></label>
+<label>Punteggio min<input id="ms" type="number" value="60"></label>
+<label>Tempo max s<input id="mx" type="number" value="7200"></label>
+<label>Telegram token<input id="tgT" type="text"></label>
+<label>Telegram chat ID<input id="tgC" type="text"></label>
+</div><div class="ctl"><button class="btn sm" id="bExp">Esporta backup</button><button class="btn sm" id="bImp">Importa backup</button><input type="file" id="fImp" accept=".json" style="display:none"></div></details>
+</div>
+<h2>Mercati live</h2><div class="cd" id="grid" style="padding:4px 12px"></div>
+<h2>Posizioni</h2>
+<div class="seg" id="tabs"><button class="btn on" data-t="o">Aperte</button><button class="btn" data-t="c">Chiuse</button></div>
+<div class="cd" id="plist" style="padding:4px 12px"></div>
+<footer>Crypto: OKX perpetual swap (WebSocket/REST pubblici, nessuna chiave). Indici e metalli: Yahoo Finance (pubblico). Nessun prezzo simulato. Ogni operazione costa €1 in apertura e €1 in chiusura. Non è consulenza finanziaria: nessun guadagno è garantito e la leva amplifica anche le perdite.</footer>
+</div><div id="toast"></div>
+<script>
+(function(){"use strict";
+var A=[
+{p:"BTC/USD",n:"Bitcoin",g:"c",b:"BTC-USDT-SWAP"},{p:"ETH/USD",n:"Ethereum",g:"c",b:"ETH-USDT-SWAP"},{p:"SOL/USD",n:"Solana",g:"c",b:"SOL-USDT-SWAP"},
+{p:"XRP/USD",n:"XRP",g:"c",b:"XRP-USDT-SWAP"},{p:"BNB/USD",n:"BNB",g:"c",b:"BNB-USDT-SWAP"},{p:"DOGE/USD",n:"Dogecoin",g:"c",b:"DOGE-USDT-SWAP"},
+{p:"SPX500",n:"S&P 500",g:"i",y:"^GSPC"},{p:"NSDQ100",n:"Nasdaq 100",g:"i",y:"^NDX"},{p:"DJ30",n:"Dow Jones",g:"i",y:"^DJI"},
+{p:"GER40",n:"DAX 40",g:"i",y:"^GDAXI"},{p:"UK100",n:"FTSE 100",g:"i",y:"^FTSE"},{p:"JPN225",n:"Nikkei 225",g:"i",y:"^N225"},
+{p:"FRA40",n:"CAC 40",g:"i",y:"^FCHI"},{p:"GOLD",n:"Oro",g:"m",y:"GC=F"},{p:"SILVER",n:"Argento",g:"m",y:"SI=F"}];
+var BY={};A.forEach(function(a){BY[a.p]=a;});
+var IDS=["cap","sz","fee","clev","lev","mo","rr","cf","ms","mx","tgT","tgC"];
+var KEY="scalper_pro_live_v3";
+var $=function(i){return document.getElementById(i);};
+var S={},feed={},stats={n:0,w:0,l:0,pnl:0,fees:0},trades=[],auto=true,push=false,tab="o",loaded=false,wsOk=0;
+A.forEach(function(a){S[a.p]={px:[],barT:0,pos:null,cool:0,an:null};});
+function num(i,d){var v=parseFloat($(i).value);return isFinite(v)?v:d;}
+function K(){return{sz:num("sz",150),fee:num("fee",1),cl:num("clev",10),l:num("lev",5),rr:num("rr",1.5),cf:num("cf",2),ms:num("ms",60),H:num("mx",7200),mo:num("mo",3),cap:num("cap",500)};}
+function KS(a,k){var lev=a.g==="c"?k.cl:k.l,x=k.sz*lev;return{lev:lev,x:x,c:2*k.fee/x*100};}
+function E(v){return(v<0?"-":"")+"€"+Math.abs(v).toFixed(2);}
+function fmt(v){return!(v>0)?"–":v>=1000?v.toFixed(2):v>=1?v.toFixed(3):v.toFixed(5);}
+function toast(t){var e=$("toast");e.textContent=t;e.className="show";clearTimeout(toast.t);toast.t=setTimeout(function(){e.className="";},3500);}
+function notify(t,b){toast(t+" · "+b);
+ if(push&&"Notification" in window&&Notification.permission==="granted"){try{new Notification(t,{body:b});}catch(e){}}
+ var tk=$("tgT").value.trim(),ch=$("tgC").value.trim();
+ if(tk&&ch)fetch("https://api.telegram.org/bot"+encodeURIComponent(tk)+"/sendMessage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:ch,text:t+"\n"+b})}).catch(function(){});}
+
+/* salvataggio */
+function save(){if(!loaded)return;var cfg={},po={};IDS.forEach(function(i){cfg[i]=$(i).value;});
+ A.forEach(function(a){if(S[a.p].pos)po[a.p]=S[a.p].pos;});
+ try{localStorage.setItem(KEY,JSON.stringify({stats:stats,trades:trades.slice(0,300),pos:po,cfg:cfg,auto:auto,push:push}));}catch(e){}}
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY)||"null");if(d){stats=d.stats||stats;trades=d.trades||[];
+ IDS.forEach(function(i){if(d.cfg&&d.cfg[i]!=null)$(i).value=d.cfg[i];});
+ A.forEach(function(a){if(d.pos&&d.pos[a.p])S[a.p].pos=d.pos[a.p];});auto=d.auto!==false;push=!!d.push&&"Notification" in window&&Notification.permission==="granted";}}catch(e){}
+ $("bAuto").textContent="Auto "+(auto?"ON":"OFF");$("bAuto").className="btn"+(auto?" on":"");ui();loaded=true;}
+function ui(){$("bPush").textContent="Notifiche "+(push?"ON":"OFF");$("bPush").className="btn"+(push?" on":"");}
+
+/* indicatori */
+function ema(a,n){var k=2/(n+1),e=a[0],o=[e];for(var i=1;i<a.length;i++){e=a[i]*k+e*(1-k);o.push(e);}return o;}
+function rsi(a,n){var g=0,l=0,i,d;for(i=a.length-n;i<a.length;i++){d=a[i]-a[i-1];if(d>0)g+=d;else l-=d;}return l===0?100:100-100/(1+g/l);}
+function ind(px){var e20=ema(px,20),e60=ema(px,60),f=ema(px,12),s=ema(px,26),m=f.map(function(v,i){return v-s[i];}),sg=ema(m,9),n=px.length-1;
+ return{e20:e20[n],e60:e60[n],h:m[n]-sg[n],ph:m[n-1]-sg[n-1],rsi:rsi(px,14)};}
+
+/* analisi: swing + Fibonacci + conferme */
+function an(a,s,k,q){var px=s.px,n=px.length;
+ if(n<100)return{w:1,sc:Math.round(n),ok:false};
+ var p=px[n-1],hi=-1e99,lo=1e99,ih=0,il=0,i;
+ for(i=Math.max(0,n-180);i<n;i++){if(px[i]>hi){hi=px[i];ih=i;}if(px[i]<lo){lo=px[i];il=i;}}
+ var R=hi-lo,ks=KS(a,k),c=ks.c;
+ if(R/p*100<0.5*c)return{sw:0,sc:5,ok:false};
+ var L=il<ih,d=L?(hi-p)/R:(p-lo)/R,I=ind(px),cf=[];
+ var zone=d>=0.382&&d<=0.7,sp=(q.ask-q.bid)/q.mid*100,gs=sp<=0.3*c;
+ var bn=L?(p>px[n-3]&&p>I.e20):(p<px[n-3]&&p<I.e20);
+ if(L?I.e20>=I.e60:I.e20<=I.e60)cf.push("EMA");
+ if(L?I.h>=I.ph:I.h<=I.ph)cf.push("MACD");
+ if(L?(I.rsi>=35&&I.rsi<=65):(I.rsi>=35&&I.rsi<=65))cf.push("RSI");
+ var sm=0,sq=0,b=Math.min(100,n),mean;for(i=n-b;i<n;i++)sm+=px[i];mean=sm/b;
+ for(i=n-b;i<n;i++)sq+=(px[i]-mean)*(px[i]-mean);var sd=Math.sqrt(sq/b),pb=sd>0?(p-(mean-2*sd))/(4*sd):.5;
+ if(L?(pb>.02&&pb<.6):(pb>.4&&pb<.98))cf.push("Bollinger");
+ var tp=Math.max(Math.abs((L?hi+0.272*R:lo-0.272*R)-p)/p*100,2*c);
+ var sl=Math.max((L?(p-(hi-0.88*R)):((lo+0.88*R)-p))/p*100,0.6*c);
+ var rr=(tp-c)/(sl+c);
+ var sc=Math.min(100,Math.round((zone?25:5)+(bn?15:0)+cf.length*12+Math.min(rr/2,1)*15));
+ return{sw:1,dir:L?"L":"S",d:d,tp:tp,sl:sl,rr:rr,cf:cf,sc:sc,c:c,
+  ok:!!(zone&&bn&&gs&&rr>=k.rr&&cf.length>=k.cf&&sc>=k.ms)};}
+
+/* conto */
+function acct(){var u=0,f=0,n=0;A.forEach(function(a){var o=S[a.p].pos;if(o){n++;u+=o.size;f+=o.fo;}});return{u:u,f:f,n:n};}
+function openPos(a,q,side,an_,k,why,manual){var ac=acct(),ks=KS(a,k),free=k.cap+stats.pnl-ac.f-ac.u;
+ if(ac.n>=k.mo){if(manual)toast("Massimo "+k.mo+" posizioni");return;}
+ if(free<k.sz+k.fee){if(manual)toast("Capitale insufficiente");return;}
+ var en=side==="L"?q.ask:q.bid,tp=an_&&an_.tp?an_.tp:2.2*ks.c,sl=an_&&an_.sl?an_.sl:1.2*ks.c;
+ S[a.p].pos={side:side,en:en,size:k.sz,x:ks.x,lev:ks.lev,fo:k.fee,t:Date.now(),tp:tp,slp:-sl,be:false,c:ks.c,why:why};
+ stats.fees+=k.fee;notify((side==="L"?"🟢 LONG ":"🔴 SHORT ")+a.n,"Ingresso "+fmt(en)+" · €"+k.sz+" ×"+ks.lev+" · TP +"+tp.toFixed(2)+"% SL -"+sl.toFixed(2)+"%");save();}
+function closePos(a,q,why){var s=S[a.p],o=s.pos;if(!o)return;
+ var ex=o.side==="L"?q.bid:q.ask,g=o.side==="L"?(ex-o.en)/o.en*100:(o.en-ex)/o.en*100,net=o.x*g/100-2*o.fo;
+ stats.fees+=o.fo;stats.n++;if(net>0)stats.w++;else stats.l++;stats.pnl+=net;
+ trades.unshift({p:a.p,n:a.n,side:o.side,size:o.size,lev:o.lev,en:o.en,ex:ex,net:net,why:why,t0:o.t,t1:Date.now()});
+ if(trades.length>300)trades.pop();s.pos=null;s.cool=Date.now()+(net<0?300000:120000);
+ notify((net>=0?"💰 CHIUSA +":"⚠️ CHIUSA ")+E(net)+" "+a.n,why+" · "+fmt(o.en)+" → "+fmt(ex));save();}
+window.__open=function(p,side){var q=feed[p];if(!q)return toast("Quotazione non disponibile");if(S[p].pos)return;var k=K();openPos(BY[p],q,side,S[p].an,k,"Apertura manuale",true);tick();};
+window.__close=function(p){if(feed[p]){closePos(BY[p],feed[p],"Chiusura manuale");tick();}};
+
+/* feed: Binance WS + REST, Yahoo per indici/metalli */
+function pushQ(p,bid,ask,state){if(!(bid>0&&ask>0))return;feed[p]={bid:bid,ask:ask,mid:(bid+ask)/2,t:Date.now(),state:state||"REGULAR"};}
+function connectWS(){var cr=A.filter(function(a){return a.b;}),ws,pg;
+ try{ws=new WebSocket("wss://ws.okx.com:8443/ws/v5/public");}catch(e){return;}
+ ws.onopen=function(){ws.send(JSON.stringify({op:"subscribe",args:cr.map(function(a){return{channel:"tickers",instId:a.b};})}));pg=setInterval(function(){try{ws.send("ping");}catch(e){}},20000);};
+ ws.onmessage=function(m){if(m.data==="pong")return;try{var j=JSON.parse(m.data);if(!j.data)return;j.data.forEach(function(d){cr.forEach(function(a){if(a.b===d.instId){pushQ(a.p,+d.bidPx,+d.askPx);wsOk=Date.now();}});});}catch(e){}};
+ ws.onclose=function(){clearInterval(pg);setTimeout(connectWS,3000);};ws.onerror=function(){try{ws.close();}catch(e){}};}
+async function jget(u){var urls=[u,"https://corsproxy.io/?"+encodeURIComponent(u),"https://api.allorigins.win/raw?url="+encodeURIComponent(u)];
+ for(var i=0;i<urls.length;i++){try{var r=await fetch(urls[i],{cache:"no-store"});if(r.ok)return await r.json();}catch(e){}}return null;}
+async function seedBinance(){await Promise.allSettled(A.filter(function(a){return a.b;}).map(async function(a){
+ var d=await jget("https://www.okx.com/api/v5/market/candles?instId="+a.b+"&bar=1m&limit=200");
+ if(d&&Array.isArray(d.data)&&d.data.length){S[a.p].px=d.data.slice().reverse().map(function(c){return+c[4];});S[a.p].barT=Date.now();}}));}
+async function restCrypto(){if(Date.now()-wsOk<10000)return;var d=await jget("https://www.okx.com/api/v5/market/tickers?instType=SWAP");
+ if(d&&Array.isArray(d.data))d.data.forEach(function(x){A.forEach(function(a){if(a.b===x.instId)pushQ(a.p,+x.bidPx,+x.askPx);});});}
+async function yahoo(seed){await Promise.allSettled(A.filter(function(a){return a.y;}).map(async function(a){
+ var d=await jget("https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(a.y)+"?interval=1m&range=1d");
+ var r=d&&d.chart&&d.chart.result&&d.chart.result[0];if(!r||!r.meta)return;
+ var cl=((r.indicators.quote[0]||{}).close||[]).filter(function(v){return typeof v==="number"&&v>0;});
+ if(seed&&cl.length>=20){S[a.p].px=cl.slice(-200);S[a.p].barT=Date.now();}
+ var px=r.meta.regularMarketPrice||cl[cl.length-1],h=px*(a.g==="m"?0.00012:0.00008);
+ pushQ(a.p,px-h,px+h,r.meta.marketState||"REGULAR");}));}
+function syncAll(seed){return Promise.allSettled([seed?seedBinance():restCrypto(),yahoo(seed)]);}
+
+/* loop principale */
+function tick(){var now=Date.now(),k=K(),cands=[],un=0,live=0,ac0=acct();
+ var halt=(k.cap+stats.pnl-ac0.f)<=k.cap*0.95;
+ A.forEach(function(a,i){var q=feed[a.p],s=S[a.p],row=$("r"+i);if(!q||now-q.t>180000){return;}live++;
+  var closed=a.g!=="c"&&q.state!=="REGULAR"&&q.state!=="OPEN";
+  if(!s.px.length){s.px.push(q.mid);s.barT=now;}
+  if(now-s.barT>=60000){s.px.push(q.mid);if(s.px.length>400)s.px.shift();s.barT=now;}else s.px[s.px.length-1]=q.mid;
+  var ks=KS(a,k),r=an(a,s,k,q);s.an=r;
+  if(s.pos){var o=s.pos,ex=o.side==="L"?q.bid:q.ask,g=o.side==="L"?(ex-o.en)/o.en*100:(o.en-ex)/o.en*100,w=null;
+   if(!o.be&&g>=o.tp*0.5){o.be=true;o.slp=o.c;save();}
+   if(g>=o.tp)w="Obiettivo raggiunto";else if(g<=o.slp)w=o.be?"Profitto protetto":"Stop loss";else if((now-o.t)/1000>=k.H)w="Tempo massimo";
+   if(w)closePos(a,q,w);else un+=o.x*g/100-o.fo;}
+  else if(auto&&loaded&&!halt&&!closed&&r.ok&&now>s.cool)cands.push({a:a,q:q,r:r});
+  var rs=row.children;rs[0].querySelector("small").textContent=closed?"mercato chiuso":(r.w?"Studio dati "+r.sc+"/100":"Setup "+r.sc+"% · "+(r.sw&&r.cf?r.cf.join(", ")||"nessuna conferma":"swing stretto"));
+  rs[1].textContent=fmt(q.mid);
+  var pp=s.pos;rs[2].className="pl"+(pp?" "+pp.side:(r.ok&&!closed?" "+r.dir:""));
+  rs[2].textContent=pp?(pp.side==="L"?"LONG":"SHORT"):closed?"CHIUSO":r.w?"STUDIO":r.ok?(r.dir==="L"?"COMPRA":"VENDI"):"ATTENDI";});
+ cands.sort(function(x,y){return y.r.sc-x.r.sc;});
+ cands.forEach(function(c){openPos(c.a,c.q,c.r.dir,c.r,k,"Score "+c.r.sc+", Fibo "+c.r.d.toFixed(2)+", conferme: "+c.r.cf.join("/"),false);});
+ var ac=acct(),eq=k.cap+stats.pnl+un,tot=eq-k.cap;
+ $("eq").textContent="€"+eq.toFixed(2);$("pl").textContent=(tot>=0?"+":"")+E(tot)+" ("+(tot/k.cap*100).toFixed(2)+"%)";$("pl").style.color=tot>0?"var(--up)":tot<0?"var(--dn)":"var(--mu)";
+ $("sR").textContent=E(k.cap+stats.pnl-ac.f-ac.u);$("sU").textContent=E(ac.u);$("sF").textContent=E(stats.fees);
+ $("sWL").textContent=stats.w+" / "+stats.l;$("sWR").textContent=stats.n?Math.round(stats.w/stats.n*100)+"%":"-";$("sO").textContent=ac.n;
+ var st=$("st");st.textContent=live>=6?"LIVE "+live+"/15":live?"PARZIALE "+live+"/15":"CONNESSIONE…";st.className=live>=6?"ok":"";
+ if(halt)st.textContent="STOP -5%";
+ renderPos(now);}
+function pr(n,side,l1,net,pct,l2,w,p){return'<div class="ps"><div><b>'+n+'</b> <span class="'+(side==="L"?"g":"r")+'">'+(side==="L"?"LONG":"SHORT")+'</span><small>'+l1+'</small><small>'+w+'</small></div><div style="text-align:right"><b class="'+(net>=0?"g":"r")+'">'+(net>=0?"+":"")+E(net)+'</b><small>'+(pct>=0?"+":"")+pct.toFixed(2)+'% · '+l2+'</small>'+(p?'<button class="btn sm dn" onclick="__close(\''+p+'\')">Chiudi</button>':"")+'</div></div>';}
+function ago(ms){var s=Math.round(ms/1000);return s<60?s+"s":s<3600?Math.floor(s/60)+"m":Math.floor(s/3600)+"h "+Math.floor(s%3600/60)+"m";}
+function renderPos(now){var h="";
+ if(tab==="o"){A.forEach(function(a){var o=S[a.p].pos,q=feed[a.p];if(!o||!q)return;var ex=o.side==="L"?q.bid:q.ask,g=o.side==="L"?(ex-o.en)/o.en*100:(o.en-ex)/o.en*100,net=o.x*g/100-2*o.fo;
+  h+=pr(a.n,o.side,"€"+o.size+" ×"+o.lev+" a "+fmt(o.en)+" → "+fmt(ex)+" · TP +"+o.tp.toFixed(2)+"% SL "+(o.slp<0?"-":"+")+Math.abs(o.slp).toFixed(2)+"%",net,net/o.size*100,ago(now-o.t),o.why,a.p);});
+  if(!h)h='<div class="em">Nessuna posizione aperta.</div>';}
+ else{trades.slice(0,60).forEach(function(t){h+=pr(t.n,t.side,"€"+t.size+" ×"+t.lev+" "+fmt(t.en)+" → "+fmt(t.ex),t.net,t.net/t.size*100,ago(t.t1-t.t0),"Uscita: "+t.why,null);});
+  if(!h)h='<div class="em">Ancora nessuna operazione chiusa.</div>';}
+ $("plist").innerHTML=h;}
+
+/* UI */
+var G=$("grid");A.forEach(function(a,i){var d=document.createElement("div");d.className="row";d.id="r"+i;
+ d.innerHTML='<div><b>'+a.n+'</b><small>in attesa feed…</small></div><div class="pr">–</div><div class="pl">ATTENDI</div>';
+ d.onclick=function(){var q=feed[a.p];if(!q||S[a.p].pos)return;
+  if(confirm("Apri posizione manuale su "+a.n+"?\nOK = LONG, Annulla = scegli SHORT"))__open(a.p,"L");else if(confirm("Aprire SHORT su "+a.n+"?"))__open(a.p,"S");};G.appendChild(d);});
+$("bAuto").onclick=function(){auto=!auto;this.textContent="Auto "+(auto?"ON":"OFF");this.className="btn"+(auto?" on":"");save();};
+$("bPush").onclick=async function(){if(!("Notification" in window))return toast("Notifiche non supportate");
+ if(push){push=false;ui();save();return;}
+ try{if(await Notification.requestPermission()==="granted"){push=true;ui();save();notify("🔔 Notifiche attive","Riceverai un avviso a ogni apertura e chiusura.");}else toast("Permesso negato");}catch(e){toast("Impossibile attivare");}};
+var rt=0;$("bRst").onclick=function(){var b=this;if(!rt){rt=setTimeout(function(){rt=0;b.textContent="Azzera";},4000);b.textContent="Conferma";return;}
+ clearTimeout(rt);rt=0;b.textContent="Azzera";stats={n:0,w:0,l:0,pnl:0,fees:0};trades=[];A.forEach(function(a){S[a.p].pos=null;S[a.p].cool=0;});save();tick();toast("Conto azzerato");};
+IDS.forEach(function(i){$(i).addEventListener("change",function(){save();tick();});});
+document.querySelectorAll("#tabs button").forEach(function(b){b.onclick=function(){tab=b.dataset.t;document.querySelectorAll("#tabs button").forEach(function(x){x.className="btn"+(x===b?" on":"");});tick();};});
+$("bExp").onclick=function(){save();var u=URL.createObjectURL(new Blob([localStorage.getItem(KEY)||"{}"],{type:"application/json"})),l=document.createElement("a");l.href=u;l.download="scalper-backup-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(l);l.click();l.remove();URL.revokeObjectURL(u);};
+$("bImp").onclick=function(){$("fImp").click();};
+$("fImp").onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){try{JSON.parse(ev.target.result);localStorage.setItem(KEY,ev.target.result);location.reload();}catch(x){toast("Backup non valido");}};r.readAsText(f);};
+document.addEventListener("visibilitychange",function(){if(document.hidden)save();});
+window.addEventListener("pagehide",save);
+
+load();connectWS();
+syncAll(true).then(tick);
+setInterval(tick,1000);
+setInterval(function(){syncAll(false);},15000);
+})();
+</script></body></html>
